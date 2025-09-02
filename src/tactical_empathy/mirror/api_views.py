@@ -27,7 +27,7 @@ class ChatbotAPIView(View):
       data = json.loads(request.body)
       conversation_id = data.get('conversation_id')
       user_message = data.get('message', '').strip()
-      max_messages = data.get('max_messages', 5)
+      max_messages = data.get('max_messages', 10)
 
       if not user_message:
         return JsonResponse({'error': 'Message is required'}, status=400)
@@ -70,10 +70,10 @@ class ChatbotAPIView(View):
       )
 
       # Get recent messages for response
-      recent_messages = conversation.get_recent_messages(limit=max_messages, reverse=True)
+      recent_messages = conversation.get_recent_messages(limit=max_messages)
       message_history = []
 
-      for msg in recent_messages:
+      for msg in reversed(recent_messages):
         message_history.append({
             'role': msg.role.name,
             'message': msg.content
