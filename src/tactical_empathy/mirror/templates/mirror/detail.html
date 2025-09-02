@@ -1,0 +1,290 @@
+{% extends 'mirror/base.html' %}
+
+{% block title %}{{ conversation.topic|truncatechars:50 }} - Tactical Empathy{% endblock %}
+
+{% block extra_css %}
+{# Block for any extra CSS links if your base.html supports it #}
+<style>
+    /* Main chat window styling */
+    .chat-window {
+        display: flex;
+        flex-direction: column;
+        height: 80vh; /* Adjust height as needed */
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f7f7f7;
+    }
+
+    /* Chat Header */
+    .chat-header {
+        background-color: #005E54; /* WhatsApp Green */
+        color: white;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .chat-header h5 {
+        margin: 0;
+        font-weight: bold;
+    }
+    .chat-header small {
+        opacity: 0.8;
+    }
+
+    /* Chat Body - where messages appear */
+    .chat-body {
+        flex-grow: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Subtle background pattern */
+        background-color: #E5DDD5;
+    }
+
+    /* Individual message row styling */
+    .msg-row {
+        display: flex;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Push user messages to the right */
+    .msg-row.user {
+        justify-content: flex-end;
+    }
+
+    /* The chat bubble itself */
+    .msg-bubble {
+        max-width: 70%;
+        padding: 0.5rem 0.75rem;
+        border-radius: 12px;
+        position: relative;
+        word-wrap: break-word;
+    }
+
+    /* Bot's message bubble style */
+    .msg-bubble.bot {
+        background-color: #FFFFFF;
+        border-top-left-radius: 0;
+    }
+
+    /* User's message bubble style */
+    .msg-bubble.user {
+        background-color: #DCF8C6; /* WhatsApp light green */
+        border-top-right-radius: 0;
+    }
+
+    .msg-content {
+        margin-bottom: 1.5rem; /* Space for the timestamp */
+    }
+
+    .msg-timestamp {
+        font-size: 0.7rem;
+        color: #999;
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+    }
+
+    /* Chat Footer - input form */
+    .chat-footer {
+        background-color: #f0f0f0;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        border-top: 1px solid #ddd;
+        flex-shrink: 0;
+    }
+
+    .chat-footer textarea {
+        flex-grow: 1;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        padding: 0.5rem 1rem;
+        resize: none;
+        max-height: 100px;
+    }
+
+    .chat-footer button {
+        background-color: #005E54;
+        color: white;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        border: none;
+        margin-left: 0.5rem;
+        flex-shrink: 0;
+    }
+    .chat-footer button:hover {
+        background-color: #004c44;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+
+            <div class="chat-window">
+                <div class="chat-header">
+                    <div>
+                        <h5 class="mb-0">{{ conversation.topic }}</h5>
+                        <small>Bot's Position: {{ conversation.bot_stance }}</small>
+                    </div>
+                </div>
+
+                <div class="chat-body" id="chat-body">
+                    {% for message in messages %}
+                        <div class="msg-row {{ message.role.name }}">
+                            <div class="msg-bubble {{ message.role.name }}">
+                                <div class="msg-content">
+                                    {{ message.content|linebreaksbr }}
+                                </div>
+                                <span class="msg-timestamp">
+                                    {{ message.created_at|date:"H:i" }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if conversation.is_active %}
+                <div class="chat-footer">
+                    <form id="continue-chat-form" class="w-100 d-flex align-items-center">
+                        <textarea class="form-control" id="new-message" name="message" rows="1" placeholder="Type a message..." required></textarea>
+                        <button type="submit" id="continue-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{% url 'list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> All Debates
+                </a>
+                <a href="{% url 'create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Debate
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// This is a helper function to create the HTML for a message bubble.
+// It makes the main code cleaner.
+function createMessageBubbleHTML(role, content) {
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    // Note: In a real app, you'd get the timestamp from the server response.
+    
+    return `
+        <div class="msg-row ${role}">
+            <div class="msg-bubble ${role}">
+                <div class="msg-content">
+                    ${content.replace(/\n/g, '<br>')}
+                </div>
+                <span class="msg-timestamp">${timestamp}</span>
+            </div>
+        </div>
+    `;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Define elements that are used multiple times
+    const chatBody = document.getElementById('chat-body');
+    const chatForm = document.getElementById('continue-chat-form');
+    const messageInput = document.getElementById('new-message');
+    const continueBtn = document.getElementById('continue-btn');
+
+    // Auto-scroll to bottom of chat on page load
+    if (chatBody) {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // Auto-resize textarea as user types
+    if (messageInput) {
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+
+    // Handle form submission
+    if (chatForm) {
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // --- START: NEW DYNAMIC LOGIC ---
+
+            // 1. Append the user's message to the chat immediately for a fast UI response.
+            const userBubbleHTML = createMessageBubbleHTML('user', message);
+            chatBody.insertAdjacentHTML('beforeend', userBubbleHTML);
+            
+            // 2. Clear the text input right away and reset its height.
+            //    This solves your request: "the text isnt cleaned".
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            
+            // 3. Scroll to the bottom to show the new message.
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // 4. Disable the button while waiting for the bot's response.
+            continueBtn.disabled = true;
+            continueBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                const response = await fetch('/conversation/api/chat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // IMPORTANT: You might need to add a CSRF token for Django POST requests from JS
+                        // 'X-CSRFToken': '{{ csrf_token }}', 
+                    },
+                    body: JSON.stringify({
+                        conversation_id: '{{ conversation.id }}',
+                        message: message
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // The API response includes the full recent history. 
+                    // The last message in the array is the bot's new reply.
+                    const botMessage = data.message[data.message.length - 1];
+
+                    // 5. Append the bot's response bubble.
+                    const botBubbleHTML = createMessageBubbleHTML(botMessage.role, botMessage.message);
+                    chatBody.insertAdjacentHTML('beforeend', botBubbleHTML);
+                    
+                    // 6. Scroll to the bottom again to show the bot's reply.
+                    chatBody.scrollTop = chatBody.scrollHeight;
+
+                } else {
+                    const data = await response.json();
+                    alert('Error: ' + (data.error || 'Failed to get a response from the bot.'));
+                    // Optionally, remove the user's optimistic message if the server fails
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            } finally {
+                // 7. Re-enable the button.
+                continueBtn.disabled = false;
+                continueBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            }
+            // --- END: NEW DYNAMIC LOGIC ---
+        });
+    }
+});
+</script>
+{% endblock %}

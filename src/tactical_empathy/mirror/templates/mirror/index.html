@@ -1,0 +1,118 @@
+{% extends 'mirror/base.html' %}
+
+{% block title %}Home - Tactical Empathy{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 mb-4">
+            <i class="fas fa-robot"></i> Tactical Empathy
+        </h1>
+        <p class="lead mb-4">
+            An AI debate bot that can argue any position with conviction and persuasion
+        </p>
+        <p class="mb-4">
+            Challenge our bot to defend any viewpoint, no matter how controversial. 
+            Experience the power of AI-driven persuasion and debate tactics.
+        </p>
+        <a href="{% url 'create' %}" class="btn btn-light btn-lg">
+            <i class="fas fa-play"></i> Start a Debate
+        </a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="fas fa-lightbulb"></i> How It Works
+                    </h2>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-comment-dots fa-3x text-primary"></i>
+                            </div>
+                            <h5>1. Start a Topic</h5>
+                            <p class="text-muted">
+                                Introduce any debate topic and the bot will automatically take a stance
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-brain fa-3x text-primary"></i>
+                            </div>
+                            <h5>2. AI Responds</h5>
+                            <p class="text-muted">
+                                Our AI analyzes your message and crafts persuasive counter-arguments
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-handshake fa-3x text-primary"></i>
+                            </div>
+                            <h5>3. Engage & Learn</h5>
+                            <p class="text-muted">
+                                Experience advanced debate techniques and persuasion strategies
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-cogs"></i> API Access
+                    </h5>
+                    <p class="card-text">
+                        Integrate our debate bot into your applications using our REST API.
+                    </p>
+                    <div class="bg-light p-3 rounded">
+                        <code>POST /conversation/api/chat/</code>
+                        <br>
+                        <small class="text-muted">
+                            Send JSON with conversation_id and message
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-history"></i> View Past Debates
+                    </h5>
+                    <p class="card-text">
+                        Browse through previous conversations to see the bot in action.
+                    </p>
+                    <a href="{% url 'list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-list"></i> Browse Debates
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle"></i> Disclaimer
+                </h5>
+                <p class="mb-0">
+                    This AI bot is designed to argue any position for demonstration purposes. 
+                    The views expressed by the bot do not reflect the opinions of the developers. 
+                    Always think critically and consult reliable sources for important decisions.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

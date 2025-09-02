@@ -1,0 +1,301 @@
+{% extends 'mirror/base.html' %}
+
+{% block title %}Test AI Providers - Tactical Empathy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-cogs"></i> Test AI Providers
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                        Test the configuration and connectivity of different AI providers. 
+                        This helps ensure your API keys are working correctly.
+                    </p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-brain"></i> OpenAI GPT
+                                    </h5>
+                                    <p class="card-text small text-muted">
+                                        Requires OPENAI_API_KEY in environment
+                                    </p>
+                                    <button class="btn btn-outline-primary btn-sm test-provider" data-provider="openai">
+                                        Test OpenAI
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-google"></i> Google Gemini
+                                    </h5>
+                                    <p class="card-text small text-muted">
+                                        Requires GEMINI_API_KEY in environment
+                                    </p>
+                                    <button class="btn btn-outline-success btn-sm test-provider" data-provider="gemini">
+                                        Test Gemini
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-code"></i> DeepSeek
+                                    </h5>
+                                    <p class="card-text small text-muted">
+                                        Requires DEEPSEEK_API_KEY in environment
+                                    </p>
+                                    <button class="btn btn-outline-warning btn-sm test-provider" data-provider="deepseek">
+                                        Test DeepSeek
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-info" id="test-all">
+                            <i class="fas fa-play"></i> Test All Providers
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card mt-4" id="results-section" style="display: none;">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line"></i> Test Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="test-results">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Help -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-question-circle"></i> Configuration Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="configAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="openaiHelp">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#openaiConfig">
+                                    OpenAI Configuration
+                                </button>
+                            </h2>
+                            <div id="openaiConfig" class="accordion-collapse collapse" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Get API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a></li>
+                                        <li>Add to your .env file: <code>OPENAI_API_KEY=sk-your-key-here</code></li>
+                                        <li>Set provider: <code>AI_PROVIDER=openai</code></li>
+                                        <li>Optional: <code>OPENAI_MODEL=gpt-3.5-turbo</code></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="geminiHelp">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#geminiConfig">
+                                    Google Gemini Configuration
+                                </button>
+                            </h2>
+                            <div id="geminiConfig" class="accordion-collapse collapse" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Get API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+                                        <li>Add to your .env file: <code>GEMINI_API_KEY=your-key-here</code></li>
+                                        <li>Set provider: <code>AI_PROVIDER=gemini</code></li>
+                                        <li>Optional: <code>GEMINI_MODEL=gemini-pro</code></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="deepseekHelp">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#deepseekConfig">
+                                    DeepSeek Configuration
+                                </button>
+                            </h2>
+                            <div id="deepseekConfig" class="accordion-collapse collapse" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Get API key from <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek Platform</a></li>
+                                        <li>Add to your .env file: <code>DEEPSEEK_API_KEY=your-key-here</code></li>
+                                        <li>Set provider: <code>AI_PROVIDER=deepseek</code></li>
+                                        <li>Optional: <code>DEEPSEEK_MODEL=deepseek-chat</code></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </a>
+                        <a href="{% url 'create' %}" class="btn btn-primary">
+                            <i class="fas fa-comments"></i> Start Debate
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Test individual provider
+document.querySelectorAll('.test-provider').forEach(button => {
+    button.addEventListener('click', function() {
+        const provider = this.dataset.provider;
+        testProvider(provider, this);
+    });
+});
+
+// Test all providers
+document.getElementById('test-all').addEventListener('click', function() {
+    const providers = ['openai', 'gemini', 'deepseek'];
+    const buttons = document.querySelectorAll('.test-provider');
+    
+    // Disable all buttons
+    buttons.forEach(btn => btn.disabled = true);
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    
+    // Test each provider
+    let completed = 0;
+    providers.forEach(provider => {
+        const button = document.querySelector(`[data-provider="${provider}"]`);
+        testProvider(provider, button, () => {
+            completed++;
+            if (completed === providers.length) {
+                // Re-enable buttons
+                buttons.forEach(btn => btn.disabled = false);
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-play"></i> Test All Providers';
+            }
+        });
+    });
+});
+
+async function testProvider(provider, button, callback = null) {
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    
+    try {
+        const formData = new FormData();
+        formData.append('provider', provider);
+        
+        const response = await fetch('{% url "test_ai" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+        
+        const result = await response.json();
+        displayResult(provider, result);
+        
+    } catch (error) {
+        displayResult(provider, {
+            success: false,
+            provider: provider,
+            error: 'Network error: ' + error.message
+        });
+    } finally {
+        button.disabled = false;
+        button.innerHTML = originalText;
+        if (callback) callback();
+    }
+}
+
+function displayResult(provider, result) {
+    const resultsSection = document.getElementById('results-section');
+    const resultsContainer = document.getElementById('test-results');
+    
+    // Show results section
+    resultsSection.style.display = 'block';
+    
+    // Create result element
+    const resultDiv = document.createElement('div');
+    resultDiv.className = `alert ${result.success ? 'alert-success' : 'alert-danger'} mb-3`;
+    
+    const icon = result.success ? 'fas fa-check-circle' : 'fas fa-times-circle';
+    const status = result.success ? 'SUCCESS' : 'FAILED';
+    
+    let content = `
+        <h6 class="alert-heading">
+            <i class="${icon}"></i> ${provider.toUpperCase()} - ${status}
+        </h6>
+        <p class="mb-1"><strong>Provider:</strong> ${result.provider || provider}</p>
+    `;
+    
+    if (result.success) {
+        content += `<p class="mb-0"><strong>Response:</strong> ${result.response}</p>`;
+    } else {
+        content += `<p class="mb-0"><strong>Error:</strong> ${result.error}</p>`;
+    }
+    
+    resultDiv.innerHTML = content;
+    
+    // Remove existing result for this provider
+    const existingResult = resultsContainer.querySelector(`[data-provider="${provider}"]`);
+    if (existingResult) {
+        existingResult.remove();
+    }
+    
+    // Add new result
+    resultDiv.setAttribute('data-provider', provider);
+    resultsContainer.appendChild(resultDiv);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
