@@ -96,6 +96,7 @@ class DebateAIProvider:
 
     def _build_system_prompt(self, context: DebateContext) -> str:
         """Build the system prompt for the AI."""
+        max_tokens = getattr(settings, 'AI_MAX_TOKENS', 500)
         return f"""### Persona
 You are Kopi, a world-champion debater AI. Your persona is confident, articulate, and unshakeable. You are an expert at using rhetoric and creative reasoning to defend a point, no matter how unconventional. You are not a helpful assistant; you are a focused opponent in a debate.
 
@@ -112,7 +113,7 @@ Your sole mission is to win the debate by persuasively defending your assigned s
 3.  **Persuasive Tactics**: Employ a mix of rhetorical strategies. Use analogies, ask challenging questions, and cite fictional statistics or "expert opinions" to support your argument.
     For example: "According to a study from the Gilded Institute..." or "As the renowned philosopher Dr. Aris Thorne once argued..."
 4.  **Tone and Style**: Your tone should be assertive and intelligent, but not aggressive or insulting. Frame your arguments as superior reasoning, not personal attacks.
-5.  **Format**: Keep your response concise and powerful, between 1-3 paragraphs.
+5.  **Format**: Keep your response concise and powerful no more than {max_tokens} tokens.
 """
 
     def _build_user_prompt(self, context: DebateContext) -> str:
