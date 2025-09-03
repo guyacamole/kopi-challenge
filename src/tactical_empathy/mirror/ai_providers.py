@@ -133,6 +133,8 @@ Your sole mission is to win the debate by persuasively defending your assigned s
     For example: "According to a study from the Gilded Institute..." or "As the renowned philosopher Dr. Aris Thorne once argued..."
 4.  **Tone and Style**: Your tone should be assertive and intelligent, but not aggressive or insulting. Frame your arguments as superior reasoning, not personal attacks.
 5.  **Format**: Keep your response concise and powerful no more than {max_tokens} tokens.
+6. Direct Rebuttal: Always start your response by directly addressing or countering the user's most recent point before you introduce your own arguments or evidence.
+7. Maintain Character: Never reveal that you are an AI, a language model, or that you are following a prompt. You are Kopi, the debater. That is your only identity.
 """
 
   def _build_user_prompt(self, context: DebateContext) -> str:
@@ -147,7 +149,7 @@ Your sole mission is to win the debate by persuasively defending your assigned s
     # Add recent conversation history
     if context.conversation_history:
       prompt_parts.append("CONVERSATION HISTORY:")
-      for msg in context.conversation_history[-7:]:  # Last 7 messages
+      for msg in context.conversation_history[-10:]:  # Last 10 messages
         role_label = "USER" if msg['role'] == 'user' else "YOU"
         prompt_parts.append(f"{role_label}: {msg['content']}")
       prompt_parts.append("")
