@@ -1,7 +1,7 @@
 # Kopi Challenge - Tactical Empathy Debate Bot
 # Makefile for project management and deployment
 
-.PHONY: help install test run down clean docker-check docker-install
+.PHONY: help install test run down clean docker-check docker-permission-check docker-install
 
 # Default target - show help
 help:
@@ -35,8 +35,28 @@ docker-check:
 		exit 1)
 	@echo "✓ Docker is installed"
 
+# Check if user has permission to run Docker commands
+docker-permission-check: docker-check
+	@echo "Checking Docker permissions..."
+	@docker info > /dev/null 2>&1 || (echo "ERROR: Permission denied to run Docker commands"; \
+		echo "You need root privileges or to be in the docker group to run Docker commands."; \
+		echo ""; \
+		echo "Solutions:"; \
+		echo "1. Run with sudo: sudo make <command>"; \
+		echo "2. Add your user to the docker group:"; \
+		echo "   sudo usermod -aG docker $$USER"; \
+		echo "   newgrp docker"; \
+		echo "   (then log out and back in)"; \
+		echo "3. Use rootless Docker (advanced):"; \
+		echo "   https://docs.docker.com/engine/security/rootless/"; \
+		echo ""; \
+		echo "Current user: $$USER"; \
+		echo "Docker groups: $$(groups | grep -o docker || echo 'not in docker group')"; \
+		exit 1)
+	@echo "✓ Docker permissions verified"
+
 # Check if Docker Compose is available
-compose-check: docker-check
+compose-check: docker-permission-check
 	@echo "Checking Docker Compose installation..."
 	@docker compose version > /dev/null 2>&1 || docker-compose --version > /dev/null 2>&1 || \
 		(echo "ERROR: Docker Compose is not installed or not in PATH"; \
@@ -130,13 +150,13 @@ run: docker-check compose-check env-check
 	@echo "To stop services: make down"
 
 # Stop all services
-down: docker-check
+down: docker-permission-check
 	@echo "Stopping all services..."
 	docker compose down
 	@echo "✓ All services stopped"
 
 # Clean up - stop and remove containers, networks, and volumes
-clean: docker-check
+clean: docker-permission-check
 	@echo "Cleaning up all containers, networks, and volumes..."
 	@echo "This will remove all data including the database!"
 	@read -p "Are you sure? [y/N] " confirm; \
@@ -151,15 +171,15 @@ clean: docker-check
 # Development helpers (not required by challenge but useful)
 
 # Show service logs
-logs: docker-check
+logs: docker-permission-check
 	docker compose logs -f
 
 # Open a shell in the app container
-shell: docker-check
+shell: docker-permission-check
 	docker compose exec app /bin/bash
 
 # Run Django management commands
-manage: docker-check
+manage: docker-permission-check
 	@if [ -z "$(CMD)" ]; then \
 		echo "Usage: make manage CMD='your_command'"; \
 		echo "Example: make manage CMD='createsuperuser'"; \
@@ -168,13 +188,13 @@ manage: docker-check
 	docker compose exec app python manage.py $(CMD)
 
 # Rebuild containers (useful during development)
-rebuild: docker-check
+rebuild: docker-permission-check
 	@echo "Rebuilding containers..."
 	docker compose build --no-cache
 	@echo "✓ Containers rebuilt"
 
 # Check service status
-status: docker-check
+status: docker-permission-check
 	@echo "Service Status:"
 	@docker compose ps
 	@echo ""
