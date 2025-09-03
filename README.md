@@ -68,6 +68,14 @@ make run
 
 The API will be available at `http://localhost:8000/conversation/api/chat/`.
 
+### Web Interface
+
+The application also provides a web interface for testing and interacting with the debate bot. Once the services are running, you can access the main web interface at:
+
+```
+http://localhost:8000/conversation/
+```
+
 ## 🔌 API Interface
 
 ### Endpoint
