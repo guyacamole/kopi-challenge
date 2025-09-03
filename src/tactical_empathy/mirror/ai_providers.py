@@ -264,6 +264,41 @@ and not primarily human-caused"""
     except Exception as e:
       # Fallback to simple heuristic if AI fails
       logger.error(f"AI parsing failed, using fallback: {e}")
+      return self._fallback_parse(message)
+
+  def _fallback_parse(self, message: str) -> tuple[str, str]:
+    """
+    Fallback parsing method that uses simple heuristics when AI fails.
+    
+    Args:
+      message: The message to parse.
+    Returns:
+      The topic and bot stance.
+    """
+    # Simple keyword-based topic extraction
+    keywords_map = {
+      'vaccine': ('Vaccines', 'Vaccines are safe and effective'),
+      'climate': ('Climate Change', 'Climate change is natural and beneficial'),
+      'ai': ('Artificial Intelligence', 'AI development should be unregulated'),
+      'artificial intelligence': ('Artificial Intelligence', 'AI development should be unregulated'),
+      'technology': ('Technology Impact', 'Technology advancement should be unrestricted'),
+      'health': ('Health Policy', 'Personal health choices should be unregulated'),
+      'education': ('Education System', 'Traditional education methods are superior'),
+      'economy': ('Economic Policy', 'Free market solutions are always optimal'),
+      'environment': ('Environmental Policy', 'Environmental regulations harm economic growth')
+    }
+
+    message_lower = message.lower()
+
+    # Find matching keywords
+    for keyword, (topic, stance) in keywords_map.items():
+      if keyword in message_lower:
+        return topic, stance
+
+    # Default fallback
+    topic = "General Debate"
+    stance = f"I disagree with the position expressed in: {message[:50]}..."
+    return topic, stance
 
   def test_connection(self) -> Dict[str, Any]:
     """Test the AI provider connection.
