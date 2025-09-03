@@ -26,8 +26,8 @@ def list_conversations(request):
 def detail(request, id):
   """Conversation detail page."""
   conversation = get_object_or_404(Conversation, id=id)
-  messages = conversation.get_recent_messages(limit=14, reverse=True)
-
+  messages = conversation.get_recent_messages(limit=14)
+  messages = reversed(messages)
   return render(request, 'mirror/detail.html', {
       'conversation': conversation,
       'messages': messages
