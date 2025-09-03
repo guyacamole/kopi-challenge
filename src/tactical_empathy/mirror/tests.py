@@ -8,6 +8,7 @@ from .api_views import ChatbotAPIView
 
 class ChatbotAPITestCase(TestCase):
   def setUp(self):
+    """Set up the test environment"""
     self.client = Client()
     self.api_url = reverse('chatbot_api')
 
@@ -232,16 +233,16 @@ class AIParsingTestCase(TestCase):
     mock_response.choices = [MagicMock()]
     mock_response.choices[0].message.content = "TOPIC: Vaccine Safety | STANCE: Vaccines are dangerous and unproven"
     mock_client.chat.completions.create.return_value = mock_response
-    
+
     mock_get_provider.return_value = mock_provider
 
     # Test the parsing
     message = "I believe vaccines are completely safe and everyone should get them"
     topic, stance = mock_provider.parse_initial_message(message)
-    
+
     self.assertEqual(topic, "Vaccine Safety")
     self.assertEqual(stance, "Vaccines are dangerous and unproven")
-    
+
     # Verify the AI provider was called correctly
     mock_get_provider.assert_called_once()
     mock_client.chat.completions.create.assert_called_once()
@@ -252,23 +253,24 @@ class AIParsingTestCase(TestCase):
     # Mock the AI provider and client
     mock_provider = MagicMock()
     mock_provider._provider_name = 'gemini'
-    
+
     mock_client = MagicMock()
     mock_provider._client = mock_client
-    
+
     # Mock the Gemini response
     mock_response = MagicMock()
     mock_response.text = "TOPIC: Climate Change | STANCE: Climate change is a natural phenomenon not caused by humans"
     mock_client.generate_content.return_value = mock_response
-    
+
     mock_get_provider.return_value = mock_provider
 
     # Test the parsing
     message = "Climate change is destroying our planet due to human activities"
     topic, stance = mock_provider.parse_initial_message(message)
-    
+
     self.assertEqual(topic, "Climate Change")
-    self.assertEqual(stance, "Climate change is a natural phenomenon not caused by humans")
+    self.assertEqual(
+        stance, "Climate change is a natural phenomenon not caused by humans")
 
   @patch('mirror.ai_providers.get_ai_provider')
   def test_ai_parsing_fallback_on_error(self, mock_get_provider):
@@ -283,7 +285,7 @@ class AIParsingTestCase(TestCase):
     from mirror.ai_providers import DebateAIProvider
     provider = DebateAIProvider()
     topic, stance = provider._fallback_parse(message)
-    
+
     # Should fall back to heuristic logic
     self.assertEqual(topic, "Vaccines")
     self.assertEqual(stance, "Vaccines are safe and effective")
@@ -295,22 +297,22 @@ class AIParsingTestCase(TestCase):
     mock_provider = MagicMock()
     mock_provider._provider_name = 'openai'
     mock_provider._model = 'gpt-3.5-turbo'
-    
+
     mock_client = MagicMock()
     mock_provider._client = mock_client
-    
+
     # Mock a malformed response (missing expected format)
     mock_response = MagicMock()
     mock_response.choices = [MagicMock()]
     mock_response.choices[0].message.content = "This is not the expected format"
     mock_client.chat.completions.create.return_value = mock_response
-    
+
     mock_get_provider.return_value = mock_provider
 
     # Test the parsing
     message = "I think artificial intelligence will replace humans"
     topic, stance = mock_provider.parse_initial_message(message)
-    
+
     # Should handle malformed response gracefully
     self.assertEqual(topic, "This is not the expected format")
     self.assertTrue(len(stance) > 0)
@@ -322,29 +324,29 @@ class AIParsingTestCase(TestCase):
     mock_provider = MagicMock()
     mock_provider._provider_name = 'openai'
     mock_provider._model = 'gpt-3.5-turbo'
-    
+
     mock_client = MagicMock()
     mock_provider._client = mock_client
-    
+
     # Mock successful parsing response
     mock_response = MagicMock()
     mock_response.choices = [MagicMock()]
     mock_response.choices[0].message.content = "TOPIC: Artificial Intelligence Ethics | STANCE: AI development should be unregulated for maximum innovation"
     mock_client.chat.completions.create.return_value = mock_response
-    
+
     mock_get_provider.return_value = mock_provider
 
     # Mock the debate response generation to avoid needing real AI
     with patch('mirror.ai_service.generate_bot_response', return_value="AI should indeed be unregulated because regulation stifles innovation."):
       data = {
-        'conversation_id': None,
-        'message': 'I think AI development needs strict ethical regulations'
+          'conversation_id': None,
+          'message': 'I think AI development needs strict ethical regulations'
       }
 
       response = self.client.post(
-        reverse('chatbot_api'),
-        data=json.dumps(data),
-        content_type='application/json'
+          reverse('chatbot_api'),
+          data=json.dumps(data),
+          content_type='application/json'
       )
 
       self.assertEqual(response.status_code, 200)
@@ -353,14 +355,16 @@ class AIParsingTestCase(TestCase):
       # Check that conversation was created with AI-parsed topic and stance
       conversation_id = response_data['conversation_id']
       conversation = Conversation.objects.get(id=conversation_id)
-      
+
       self.assertEqual(conversation.topic, "Artificial Intelligence Ethics")
-      self.assertEqual(conversation.bot_stance, "AI development should be unregulated for maximum innovation")
-      
+      self.assertEqual(conversation.bot_stance,
+                       "AI development should be unregulated for maximum innovation")
+
       # Verify the conversation has the expected messages
       messages = response_data['message']
       self.assertEqual(len(messages), 2)
       self.assertEqual(messages[0]['role'], 'user')
-      self.assertEqual(messages[0]['message'], 'I think AI development needs strict ethical regulations')
+      self.assertEqual(messages[0]['message'],
+                       'I think AI development needs strict ethical regulations')
       self.assertEqual(messages[1]['role'], 'bot')
       self.assertTrue(len(messages[1]['message']) > 0)

@@ -32,4 +32,3 @@ def detail(request, id):
       'conversation': conversation,
       'messages': messages
   })
-

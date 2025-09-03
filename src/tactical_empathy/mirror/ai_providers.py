@@ -11,7 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 class AIProviderError(Exception):
-  print(f"AIProviderError: {Exception}")
+  def __init__(self, message: str):
+    self.message = message
+    super().__init__(self.message)
+    print(f"AIProviderError: {self.message}")
 
 
 class DebateContext(BaseModel):
@@ -35,7 +38,10 @@ class DebateAIProvider:
     self._initialize_provider()
 
   def _initialize_provider(self):
-    """Initialize the AI provider based on configuration."""
+    """Initialize the AI provider based on configuration.
+    Args:
+      self: The DebateAIProvider instance.
+    """
     self._provider_name = getattr(settings, 'AI_PROVIDER', 'openai').lower()
 
     try:
@@ -51,7 +57,10 @@ class DebateAIProvider:
       raise AIProviderError(f"AI provider initialization failed: {e}")
 
   def _initialize_openai(self):
-    """Initialize OpenAI client."""
+    """Initialize OpenAI client.
+    Args:
+      self: The DebateAIProvider instance.
+    """
     try:
       import openai
       api_key = getattr(settings, 'OPENAI_API_KEY', None)
@@ -76,7 +85,12 @@ class DebateAIProvider:
       raise AIProviderError(f"Failed to initialize OpenAI client: {e}")
 
   def generate_response(self, context: DebateContext) -> str:
-    """Generate a response using the configured AI provider."""
+    """Generate a response using the configured AI provider.
+    Args:
+      context: The context for the debate.
+    Returns:
+      The response from the AI provider.
+    """
     try:
       # Build the system and user prompts
       system_prompt = self._build_system_prompt(context)
@@ -95,7 +109,12 @@ class DebateAIProvider:
       raise AIProviderError(f"Failed to generate response: {e}")
 
   def _build_system_prompt(self, context: DebateContext) -> str:
-    """Build the system prompt for the AI."""
+    """Build the system prompt for the AI.
+    Args:
+      context: The context for the debate.
+    Returns:
+      The system prompt for the AI.
+    """
     max_tokens = getattr(settings, 'AI_MAX_TOKENS', 500)
     return f"""### Persona
 You are Kopi, a world-champion debater AI. Your persona is confident, articulate, and unshakeable. You are an expert at using rhetoric and creative reasoning to defend a point, no matter how unconventional. You are not a helpful assistant; you are a focused opponent in a debate.
@@ -117,7 +136,12 @@ Your sole mission is to win the debate by persuasively defending your assigned s
 """
 
   def _build_user_prompt(self, context: DebateContext) -> str:
-    """Build the user prompt with conversation context."""
+    """Build the user prompt with conversation context.
+    Args:
+      context: The context for the debate.
+    Returns:
+      The user prompt for the AI.
+    """
     prompt_parts = []
 
     # Add recent conversation history
@@ -131,7 +155,13 @@ Your sole mission is to win the debate by persuasively defending your assigned s
     return "\n".join(prompt_parts)
 
   def _generate_openai_response(self, system_prompt: str, user_prompt: str) -> str:
-    """Generate response using OpenAI."""
+    """Generate response using OpenAI.
+    Args:
+      system_prompt: The system prompt for the AI.
+      user_prompt: The user prompt for the AI.
+    Returns:
+      The response from the AI provider.
+    """
     print(system_prompt)
     print(user_prompt)
     response = self._client.chat.completions.create(
@@ -147,7 +177,12 @@ Your sole mission is to win the debate by persuasively defending your assigned s
     return response.choices[0].message.content.strip()
 
   def _post_process_response(self, response: str) -> str:
-    """Post-process the AI response."""
+    """Post-process the AI response.
+    Args:
+      response: The response from the AI provider.
+    Returns:
+      The post-processed response.
+    """
     if not response or not response.strip():
       raise AIProviderError("AI generated an empty response")
 
@@ -168,8 +203,10 @@ Your sole mission is to win the debate by persuasively defending your assigned s
     Parse the initial message to extract topic and bot stance using AI.
     The AI will analyze the message and determine an appropriate debate topic and contrarian stance.
 
+    Args:
+      message: The message to parse.
     Returns:
-        tuple: (topic, bot_stance)
+      The topic and bot stance.
     """
     try:
       # Create a system prompt for topic/stance extraction
@@ -206,37 +243,6 @@ and not primarily human-caused"""
             temperature=0.3
         )
         ai_response = response.choices[0].message.content.strip()
-      elif self._provider_name == 'gemini':
-        full_prompt = f"{system_prompt}\n\n{user_prompt}"
-        response = self._client.generate_content(
-            full_prompt,
-            generation_config={'temperature': 0.3, 'max_output_tokens': 200}
-        )
-        ai_response = response.text.strip()
-      elif self._provider_name == 'deepseek':
-        import httpx
-        headers = {
-            'Authorization': f'Bearer {self._api_key}',
-            'Content-Type': 'application/json'
-        }
-        data = {
-            'model': self._model,
-            'messages': [
-                {'role': 'system', 'content': system_prompt},
-                {'role': 'user', 'content': user_prompt}
-            ],
-            'max_tokens': 200,
-            'temperature': 0.3
-        }
-        with httpx.Client(timeout=30) as client:
-          response = client.post(
-              f"{self._base_url}/chat/completions",
-              headers=headers,
-              json=data
-          )
-          response.raise_for_status()
-          result = response.json()
-          ai_response = result['choices'][0]['message']['content'].strip()
       else:
         raise AIProviderError(f"Unsupported provider: {self._provider_name}")
 
@@ -257,36 +263,12 @@ and not primarily human-caused"""
     except Exception as e:
       # Fallback to simple heuristic if AI fails
       logger.error(f"AI parsing failed, using fallback: {e}")
-      return self._fallback_parse(message)
-
-  def _fallback_parse(self, message: str) -> tuple[str, str]:
-    """
-    Fallback heuristic parsing when AI fails.
-
-    Returns:
-        tuple: (topic, bot_stance)
-    """
-    message_lower = message.lower()
-
-    if 'flat earth' in message_lower or 'earth is flat' in message_lower:
-      return "Shape of the Earth", "The Earth is flat"
-    elif 'climate change' in message_lower:
-      if 'not real' in message_lower or 'hoax' in message_lower:
-        return "Climate Change", "Climate change is not caused by humans"
-      else:
-        return "Climate Change", "Climate change is a serious threat"
-    elif 'vaccine' in message_lower:
-      if 'dangerous' in message_lower or 'harmful' in message_lower:
-        return "Vaccines", "Vaccines are dangerous and should be avoided"
-      else:
-        return "Vaccines", "Vaccines are safe and effective"
-    else:
-      # Default: extract topic from message and take a contrarian stance
-      topic = message[:100] + "..." if len(message) > 100 else message
-      return topic, f"I disagree with the premise in: {message[:50]}..."
 
   def test_connection(self) -> Dict[str, Any]:
-    """Test the AI provider connection."""
+    """Test the AI provider connection.
+    Returns:
+      The test connection result.
+    """
     try:
       test_context = DebateContext(
           topic="Test Topic",
@@ -318,7 +300,10 @@ _ai_provider: Optional[DebateAIProvider] = None
 
 
 def get_ai_provider() -> DebateAIProvider:
-  """Get the global AI provider instance."""
+  """Get the global AI provider instance.
+  Returns:
+    The global AI provider instance.
+  """
   global _ai_provider
 
   if _ai_provider is None:
@@ -328,7 +313,12 @@ def get_ai_provider() -> DebateAIProvider:
 
 
 def test_ai_provider(provider_name: str = None) -> Dict[str, Any]:
-  """Test the AI provider configuration."""
+  """Test the AI provider configuration.
+  Args:
+    provider_name: The name of the provider to test.
+  Returns:
+    The test connection result.
+  """
   if provider_name:
     # Temporarily override the provider for testing
     original_provider = getattr(settings, 'AI_PROVIDER', 'openai')

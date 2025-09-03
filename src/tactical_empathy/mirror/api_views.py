@@ -17,12 +17,15 @@ logger = logging.getLogger(__name__)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatbotAPIView(View):
-  """
-  API endpoint for the chatbot challenge.
-  Handles conversation creation and message processing.
-  """
-
   def post(self, request):
+    """
+    API endpoint for the chatbot challenge.
+    Handles conversation creation and message processing.
+    Args:
+      request: The request object.
+    Returns:
+      The response object.
+    """
     try:
       data = json.loads(request.body)
       conversation_id = data.get('conversation_id')
