@@ -154,7 +154,7 @@ API_TIMEOUT = 30  # seconds
 
 # AI Configuration
 AI_PROVIDER = os.environ.get('AI_PROVIDER', 'openai')
-AI_MAX_TOKENS = int(os.environ.get('AI_MAX_TOKENS', '500'))
+AI_MAX_TOKENS = int(os.environ.get('AI_MAX_TOKENS', '1500'))
 AI_TEMPERATURE = float(os.environ.get('AI_TEMPERATURE', '0.8'))
 AI_TIMEOUT = int(os.environ.get('AI_TIMEOUT', '30'))
 

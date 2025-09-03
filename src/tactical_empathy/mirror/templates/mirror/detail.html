@@ -214,6 +214,17 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
+
+        // --- START: FIX FOR ENTER KEY ---
+        // Add a keydown event listener to the message input
+        messageInput.addEventListener('keydown', function(e) {
+            // Check if the Enter key is pressed without the Shift key
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent the default action (new line)
+                chatForm.dispatchEvent(new Event('submit', { cancelable: true })); // Trigger the form submission
+            }
+        });
+        // --- END: FIX FOR ENTER KEY ---
     }
 
     // Handle form submission
