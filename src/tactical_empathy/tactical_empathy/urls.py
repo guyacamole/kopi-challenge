@@ -21,7 +21,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('conversation/', include('mirror.urls')),
+    path('api/v1/', include('mirror.urls')),
+    # path('chat/', include('mirror_chat.urls')),
 ]
 
 # Serve static files during development

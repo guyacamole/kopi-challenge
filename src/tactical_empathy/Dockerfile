@@ -2,9 +2,12 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install system dependencies including postgresql-client
+# Install system dependencies including postgresql-client and dbmate
 RUN apt-get update && apt-get install -y \
     postgresql-client \
+    curl \
+    && curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 \
+    && chmod +x /usr/local/bin/dbmate \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching

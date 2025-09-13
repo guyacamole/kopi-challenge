@@ -3,8 +3,8 @@ AI service for generating persuasive bot responses in debates.
 This module handles the core logic for creating convincing arguments using pydantic-ai.
 """
 
-from .models import Conversation
-from .ai_providers import get_ai_provider, DebateContext
+from ...models import Conversation
+from ..utils.openAI_provider import get_openai_provider, DebateContext
 
 
 class DebateBot:
@@ -21,8 +21,8 @@ class DebateBot:
     Returns:
       The generated response.
     """
-    # Get AI provider (singleton instance)
-    ai_provider = get_ai_provider()
+    # Get OpenAI provider (singleton instance)
+    ai_provider = get_openai_provider()
 
     # Get conversation history
     messages = list(conversation.messages.select_related(

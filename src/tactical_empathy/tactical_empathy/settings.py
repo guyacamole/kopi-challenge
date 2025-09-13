@@ -43,8 +43,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'mirror'
+    'mirror',
+    'drf_spectacular'
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Disable Django migrations for apps using dbmate
+MIGRATION_MODULES = {
+    'mirror': None,  # Disable migrations for mirror app since we use dbmate
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -85,10 +94,10 @@ WSGI_APPLICATION = 'tactical_empathy.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', os.environ.get('POSTGRES_DB', 'tactical_empathy')),
-        'USER': os.environ.get('DB_USER', os.environ.get('POSTGRES_USER', 'postgres')),
-        'PASSWORD': os.environ.get('DB_PASSWORD', os.environ.get('POSTGRES_PASSWORD', 'postgres')),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'NAME': os.environ.get('DB_NAME', os.environ.get('POSTGRES_DB', 'tactical_empathy_dev')),
+        'USER': os.environ.get('DB_USER', os.environ.get('POSTGRES_USER', 'kopi_challenge')),
+        'PASSWORD': os.environ.get('DB_PASSWORD', os.environ.get('POSTGRES_PASSWORD', 'kopi_challenge')),
+        'HOST': os.environ.get('DB_HOST', '192.168.0.209'),
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }

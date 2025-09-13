@@ -40,9 +40,13 @@ export PGPASSWORD=$DB_PASSWORD
 psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -c "SELECT version();" > /dev/null
 echo "Database connection verified successfully!"
 
-# Run database migrations
-echo "Running database migrations..."
-python manage.py migrate
+# Run database migrations using dbmate
+echo "Running database migrations with dbmate..."
+# URL encode the password to handle special characters
+ENCODED_PASSWORD=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${DB_PASSWORD}', safe=''))")
+export DATABASE_URL="postgres://${DB_USER}:${ENCODED_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"
+dbmate new actual_schema
+dbmate up
 
 # Start the application
 echo "Starting application..."
