@@ -14,8 +14,8 @@ urlpatterns = [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     # Web interface endpoints
-    path('web/', views_web.index, name='index'),
-    path('web/create/', views_web.create, name='create'),
-    path('web/list/', views_web.list_conversations, name='list'),
-    path('web/conversation/<str:id>/', views_web.detail, name='detail'),
+    path('', views_web.index, name='index'),
+    path('create/', views_web.create, name='create'),
+    path('list/', views_web.list_conversations, name='list'),
+    path('conversation/<str:id>/', views_web.detail, name='detail'),
 ]
