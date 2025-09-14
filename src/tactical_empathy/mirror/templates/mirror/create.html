@@ -111,15 +111,14 @@ document.getElementById('debate-form').addEventListener('submit', async function
     const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
     
     try {
-        const response = await fetch('/conversation/api/chat/', {
+        const response = await fetch('/api/v1/debate/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken // Add CSRF token for security
             },
             body: JSON.stringify({
-                conversation_id: null,
-                message: message
+                user_message: message
             })
         });
         
@@ -128,7 +127,7 @@ document.getElementById('debate-form').addEventListener('submit', async function
         if (response.ok) {
             // On success, redirect to the new conversation's detail page
             const conversationId = data.conversation_id;
-            window.location.href = `/conversation/${conversationId}/`;
+            window.location.href = `/web/conversation/${conversationId}/`;
         } else {
             alert('Error: ' + (data.error || 'Failed to start debate'));
             startBtn.disabled = false;

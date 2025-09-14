@@ -35,7 +35,7 @@
                                         {{ conversation.created_at|date:"M d, Y H:i" }}
                                     </small>
                                     <span class="badge bg-secondary">
-                                        {{ conversation.messages.count }} messages
+                                        {{ conversation.message_count|default:0 }} messages
                                     </span>
                                 </div>
                             </div>

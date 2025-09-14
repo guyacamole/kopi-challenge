@@ -153,6 +153,7 @@
                 {% if conversation.is_active %}
                 <div class="chat-footer">
                     <form id="continue-chat-form" class="w-100 d-flex align-items-center">
+                        {% csrf_token %}
                         <textarea class="form-control" id="new-message" name="message" rows="1" placeholder="Type a message..." required></textarea>
                         <button type="submit" id="continue-btn">
                             <i class="fas fa-paper-plane"></i>
@@ -254,32 +255,34 @@ document.addEventListener('DOMContentLoaded', function() {
             continueBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             
             try {
-                const response = await fetch('/conversation/api/chat/', {
+                const response = await fetch('/api/v1/debate/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        // IMPORTANT: You might need to add a CSRF token for Django POST requests from JS
-                        // 'X-CSRFToken': '{{ csrf_token }}', 
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
                     },
                     body: JSON.stringify({
                         conversation_id: '{{ conversation.id }}',
-                        message: message
+                        user_message: message
                     })
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
                     
-                    // The API response includes the full recent history. 
-                    // The last message in the array is the bot's new reply.
-                    const botMessage = data.message[data.message.length - 1];
+                    // The API response includes the full message history
+                    // Find the last bot message (the new response)
+                    const messages = data.messages;
+                    const lastBotMessage = messages.filter(msg => msg.role_name === 'bot').pop();
 
-                    // 5. Append the bot's response bubble.
-                    const botBubbleHTML = createMessageBubbleHTML(botMessage.role, botMessage.message);
-                    chatBody.insertAdjacentHTML('beforeend', botBubbleHTML);
-                    
-                    // 6. Scroll to the bottom again to show the bot's reply.
-                    chatBody.scrollTop = chatBody.scrollHeight;
+                    if (lastBotMessage) {
+                        // 5. Append the bot's response bubble.
+                        const botBubbleHTML = createMessageBubbleHTML('bot', lastBotMessage.content);
+                        chatBody.insertAdjacentHTML('beforeend', botBubbleHTML);
+                        
+                        // 6. Scroll to the bottom again to show the bot's reply.
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }
 
                 } else {
                     const data = await response.json();

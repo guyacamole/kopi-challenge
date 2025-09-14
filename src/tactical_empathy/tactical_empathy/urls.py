@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('mirror.urls')),
+    path('', include('mirror.urls')),  # Include web interface at root
     # path('chat/', include('mirror_chat.urls')),
 ]
 

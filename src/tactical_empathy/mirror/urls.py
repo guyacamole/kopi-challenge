@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, views_web
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView
 
 urlpatterns = [
@@ -12,5 +12,10 @@ urlpatterns = [
     path('messages/', views.messages_api_post, name='messages_api_post'),
     # API schema and documentation
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='redoc'), name='redoc'),
+    # Web interface endpoints
+    path('web/', views_web.index, name='index'),
+    path('web/create/', views_web.create, name='create'),
+    path('web/list/', views_web.list_conversations, name='list'),
+    path('web/conversation/<str:id>/', views_web.detail, name='detail'),
 ]
