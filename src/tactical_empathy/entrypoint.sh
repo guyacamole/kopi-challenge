@@ -45,7 +45,6 @@ echo "Running database migrations with dbmate..."
 # URL encode the password to handle special characters
 ENCODED_PASSWORD=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${DB_PASSWORD}', safe=''))")
 export DATABASE_URL="postgres://${DB_USER}:${ENCODED_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable"
-dbmate new actual_schema
 dbmate up
 
 # Start the application
