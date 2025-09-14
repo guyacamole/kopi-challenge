@@ -7,7 +7,120 @@ from datetime import datetime
 
 class MessageBase(BaseModel):
     """Schema for a message."""
-    content: str = Field(..., description="The content of the message", example="Hello, how are you?")
+    content: str = Field(..., description="The content of the message", example="Hello, how are you?")--------------------
+
+  27 |     # RUN python manage.py migrate
+
+  28 |     
+
+  29 | >>> RUN python manage.py collectstatic --noinput
+
+  30 |     
+
+  31 |     EXPOSE 8000
+
+--------------------
+
+failed to solve: process "/bin/sh -c python manage.py collectstatic --noinput" did not complete successfully: exit code: 1
+
+668  /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+
+github.com/moby/buildkit/executor/runcexecutor.exitError
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/executor/runcexecutor/executor.go:391
+
+github.com/moby/buildkit/executor/runcexecutor.(*runcExecutor).Run
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/executor/runcexecutor/executor.go:339
+
+github.com/moby/buildkit/solver/llbsolver/ops.(*ExecOp).Exec
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/llbsolver/ops/exec.go:492
+
+github.com/moby/buildkit/solver.(*sharedOp).Exec.func2
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/jobs.go:1120
+
+github.com/moby/buildkit/util/flightcontrol.(*call[...]).run
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/util/flightcontrol/flightcontrol.go:122
+
+sync.(*Once).doSlow
+
+	/usr/local/go/src/sync/once.go:78
+
+sync.(*Once).Do
+
+	/usr/local/go/src/sync/once.go:69
+
+runtime.goexit
+
+	/usr/local/go/src/runtime/asm_arm64.s:1223
+
+
+
+610991 v0.25.0 /usr/libexec/docker/cli-plugins/docker-buildx bake --file - --progress rawjson --metadata-file /tmp/compose-build-metadataFile-2142086426.json --allow fs.read=/home/guyacamole/docker/kopi-challenge
+
+google.golang.org/grpc.(*ClientConn).Invoke
+
+	google.golang.org/grpc@v1.72.2/call.go:35
+
+github.com/moby/buildkit/api/services/control.(*controlClient).Solve
+
+	github.com/moby/buildkit@v0.23.0/api/services/control/control_grpc.pb.go:88
+
+github.com/moby/buildkit/client.(*Client).solve.func2
+
+	github.com/moby/buildkit@v0.23.0/client/solve.go:268
+
+golang.org/x/sync/errgroup.(*Group).add.func1
+
+	golang.org/x/sync@v0.14.0/errgroup/errgroup.go:130
+
+runtime.goexit
+
+	runtime/asm_arm64.s:1223
+
+
+
+668  /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+
+github.com/moby/buildkit/solver.(*edge).execOp
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/edge.go:963
+
+github.com/moby/buildkit/solver/internal/pipe.NewWithFunction[...].func2
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/internal/pipe/pipe.go:78
+
+runtime.goexit
+
+	/usr/local/go/src/runtime/asm_arm64.s:1223
+
+
+
+610991 v0.25.0 /usr/libexec/docker/cli-plugins/docker-buildx bake --file - --progress rawjson --metadata-file /tmp/compose-build-metadataFile-2142086426.json --allow fs.read=/home/guyacamole/docker/kopi-challenge
+
+github.com/moby/buildkit/client.(*Client).solve.func2
+
+	github.com/moby/buildkit@v0.23.0/client/solve.go:285
+
+golang.org/x/sync/errgroup.(*Group).add.func1
+
+	golang.org/x/sync@v0.14.0/errgroup/errgroup.go:130
+
+
+
+668  /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+
+github.com/moby/buildkit/solver/llbsolver/ops.(*ExecOp).Exec
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/llbsolver/ops/exec.go:513
+
+github.com/moby/buildkit/solver.(*sharedOp).Exec.func2
+
+	/root/build-deb/engine/vendor/github.com/moby/buildkit/solver/jobs.go:1120
+
 
 
 class MessageCreate(MessageBase):
