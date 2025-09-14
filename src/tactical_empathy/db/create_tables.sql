@@ -1,5 +1,3 @@
--- migrate:up
-
 -- Create extension for UUID generation
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -46,7 +44,7 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Create triggers to automatically update updated_at
+-- Create triggers to automatically update updated_at (drop first to avoid conflicts)
 DROP TRIGGER IF EXISTS update_roles_updated_at ON roles;
 CREATE TRIGGER update_roles_updated_at BEFORE UPDATE ON roles
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -57,27 +55,3 @@ CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON conversations
 
 -- Insert default roles
 INSERT INTO roles (name) VALUES ('user'), ('bot') ON CONFLICT (name) DO NOTHING;
-
--- migrate:down
-
--- Drop triggers
-DROP TRIGGER IF EXISTS update_conversations_updated_at ON conversations;
-DROP TRIGGER IF EXISTS update_roles_updated_at ON roles;
-
--- Drop trigger function
-DROP FUNCTION IF EXISTS update_updated_at_column();
-
--- Drop indexes
-DROP INDEX IF EXISTS idx_conversations_is_active;
-DROP INDEX IF EXISTS idx_conversations_created_at;
-DROP INDEX IF EXISTS idx_messages_created_at;
-DROP INDEX IF EXISTS idx_messages_role_id;
-DROP INDEX IF EXISTS idx_messages_conversation_id;
-
--- Drop tables (in reverse order due to foreign keys)
-DROP TABLE IF EXISTS messages;
-DROP TABLE IF EXISTS conversations;
-DROP TABLE IF EXISTS roles;
-
--- Drop extension (only if no other tables use it)
--- DROP EXTENSION IF EXISTS "uuid-ossp";
