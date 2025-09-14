@@ -1,0 +1,543 @@
+{
+	"info": {
+		"_postman_id": "tactical-empathy-api-collection",
+		"name": "Tactical Empathy API Collection",
+		"description": "Complete API testing collection for the Tactical Empathy debate platform. This collection includes all endpoints for conversations, debates, and messages with proper test cases and error scenarios.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Conversations",
+			"item": [
+				{
+					"name": "Get All Conversations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Conversation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('conversation_id', response.id);",
+									"    pm.test('Conversation created successfully', function () {",
+									"        pm.expect(response.id).to.exist;",
+									"        pm.expect(response.topic).to.eql('Climate Change Discussion');",
+									"        pm.expect(response.bot_stance).to.eql('Climate change is a serious global issue');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"topic\": \"Climate Change Discussion\",\n    \"bot_stance\": \"Climate change is a serious global issue\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Conversation by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/{{conversation_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", "{{conversation_id}}", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Conversation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"topic\": \"Updated Climate Change Discussion\",\n    \"bot_stance\": \"Climate change requires immediate global action\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/{{conversation_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", "{{conversation_id}}", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Conversation",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/{{conversation_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", "{{conversation_id}}", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Debates",
+			"item": [
+				{
+					"name": "Create New Debate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('debate_conversation_id', response.conversation_id);",
+									"    pm.test('Debate created successfully', function () {",
+									"        pm.expect(response.conversation_id).to.exist;",
+									"        pm.expect(response.messages).to.be.an('array');",
+									"        pm.expect(response.messages.length).to.be.at.least(2);",
+									"        pm.expect(response.user_message).to.eql('I believe pineapple belongs on pizza');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_message\": \"I believe pineapple belongs on pizza\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/debate/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "debate", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Continue Existing Debate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_message\": \"But pineapple adds a sweet contrast to the savory flavors\",\n    \"conversation_id\": \"{{debate_conversation_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/debate/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "debate", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Debate by Conversation ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/debate/{{debate_conversation_id}}/?max_messages=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "debate", "{{debate_conversation_id}}", ""],
+							"query": [
+								{
+									"key": "max_messages",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Messages",
+			"item": [
+				{
+					"name": "Get All Messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/messages/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "messages", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Message",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('message_id', response.id);",
+									"    pm.test('Message created successfully', function () {",
+									"        pm.expect(response.id).to.exist;",
+									"        pm.expect(response.content).to.eql('This is a test message');",
+									"        pm.expect(response.role_name).to.eql('user');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"This is a test message\",\n    \"conversation_id\": \"{{debate_conversation_id}}\",\n    \"role_name\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/messages/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "messages", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Message by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/messages/{{message_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "messages", "{{message_id}}", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Message",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"This is an updated test message\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/messages/{{message_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "messages", "{{message_id}}", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Message",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/messages/{{message_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "messages", "{{message_id}}", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Error Scenarios",
+			"item": [
+				{
+					"name": "Invalid UUID Test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/invalid-uuid/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", "invalid-uuid", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Non-existent Conversation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/12345678-1234-1234-1234-123456789012/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", "12345678-1234-1234-1234-123456789012", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Missing Required Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"topic\": \"Missing bot_stance field\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Empty Debate Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_message\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/debate/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "debate", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid JSON Format",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"invalid\": json\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/conversation/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conversation", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Integration Tests",
+			"item": [
+				{
+					"name": "Full Workflow Test - Create Conversation and Debate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('workflow_conversation_id', response.conversation_id);",
+									"    pm.test('Full workflow completed successfully', function () {",
+									"        pm.expect(response.conversation_id).to.exist;",
+									"        pm.expect(response.messages).to.be.an('array');",
+									"        pm.expect(response.messages.length).to.be.at.least(2);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_message\": \"Electric cars are too expensive for most people\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/debate/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "debate", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Continue Debate Multiple Times",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_message\": \"The government subsidies don't make them affordable enough\",\n    \"conversation_id\": \"{{workflow_conversation_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/debate/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "debate", ""]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Final Debate State",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/debate/{{workflow_conversation_id}}/?max_messages=50",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "debate", "{{workflow_conversation_id}}", ""],
+							"query": [
+								{
+									"key": "max_messages",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "conversation_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "debate_conversation_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "message_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "workflow_conversation_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
