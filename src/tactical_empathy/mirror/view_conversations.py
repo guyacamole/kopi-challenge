@@ -186,7 +186,7 @@ class ConversationAPIViewWithId(APIView):
             data = dict(request.data)
             data['id'] = conversation_id
             conversation_update = ConversationUpdate(**data)
-            conversation = update_conversation(conversation_update)
+            conversation = update_conversation(conversation_update, conversation_id)
             
             response_data = {
                 'id': str(conversation.id),

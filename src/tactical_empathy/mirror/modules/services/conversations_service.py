@@ -20,9 +20,9 @@ def get_conversation(conversation_id: uuid.UUID) -> Conversation:
   return get_object_or_404(Conversation, id=conversation_id)
 
 
-def update_conversation(conversation_update: ConversationUpdate) -> Conversation:
+def update_conversation(conversation_update: ConversationUpdate, conversation_id: uuid.UUID) -> Conversation:
   """Update a conversation."""
-  conversation = get_object_or_404(Conversation, id=conversation_update.id)
+  conversation = get_object_or_404(Conversation, id=conversation_id)
   if conversation_update.topic:
     conversation.topic = conversation_update.topic
   if conversation_update.bot_stance:

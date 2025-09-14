@@ -48,7 +48,6 @@ class ConversationCreate(BaseModel):
 
 class ConversationUpdate(BaseModel):
     """Schema for updating a conversation."""
-    id: uuid.UUID
     topic: Optional[str] = Field(None, description="The topic of the conversation", max_length=255)
     bot_stance: Optional[str] = Field(None, description="The bot's stance on the topic", max_length=255)
 
