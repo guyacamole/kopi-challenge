@@ -35,8 +35,14 @@ class OpenAIProvider:
 
             # Validate required configuration
             api_key = getattr(settings, 'OPENAI_API_KEY', None)
-            if not api_key:
+            
+            # Allow testing without API key
+            if not api_key and not getattr(settings, 'TESTING', False):
                 raise OpenAIError("OPENAI_API_KEY not configured in settings")
+            
+            # Use dummy key for testing
+            if not api_key and getattr(settings, 'TESTING', False):
+                api_key = "test-key-for-testing"
 
             # Optimized client configuration
             client_kwargs = {

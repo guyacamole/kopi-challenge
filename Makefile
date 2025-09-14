@@ -10,7 +10,9 @@ help:
 	@echo ""
 	@echo "  make          Show this help message"
 	@echo "  make install  Install all requirements to run the service"
-	@echo "  make test     Run the test suite"
+	@echo "  make test     Run the test suite (requires API key)"
+	@echo "  make test-offline  Run tests without API key (model & view tests only)"
+	@echo "  make test-full     Run all tests including AI tests (requires API key)"
 	@echo "  make run      Start all services with Docker Compose"
 	@echo "  make down     Stop all running services"
 	@echo "  make clean    Stop and remove all containers, networks, and volumes"
@@ -21,7 +23,7 @@ help:
 	@echo "  3. Run 'make install' to check dependencies"
 	@echo "  4. Run 'make run' to start the services"
 	@echo ""
-	@echo "API Endpoint: http://localhost:8000/conversation/api/chat/"
+	@echo "API Endpoint: http://localhost:8000/api/v1/debate/"
 
 # Check if Docker is installed
 docker-check:
@@ -114,11 +116,36 @@ install: make-check docker-check compose-check env-check
 	@echo "  make run    # Start all services"
 	@echo "  make test   # Run tests"
 	@echo ""
-	@echo "The API will be available at: http://localhost:8000/conversation/api/chat/"
+	@echo "The API will be available at: http://localhost:8000/api/v1/debate/"
 
 # Run tests
 test: docker-check compose-check env-check
 	@echo "Running test suite..."
+	@if docker compose ps | grep -q "tactical_empathy_app.*Up"; then \
+		echo "Running tests in existing container..."; \
+		docker compose exec -e TESTING=true app python manage.py test mirror.tests --verbosity=2; \
+	else \
+		echo "Starting temporary containers for testing..."; \
+		docker compose run --rm -e TESTING=true app python manage.py test mirror.tests --verbosity=2; \
+	fi
+	@echo "✓ Tests completed"
+
+# Run tests without API key requirements (offline mode)
+test-offline: docker-check compose-check
+	@echo "Running test suite in offline mode (no API key required)..."
+	@echo "Running model and view tests (no AI API calls needed)..."
+	@if docker compose ps | grep -q "tactical_empathy_app.*Up"; then \
+		echo "Running tests in existing container..."; \
+		docker compose exec app python manage.py test mirror.tests.ModelTestCase mirror.tests.ViewTestCase --verbosity=2; \
+	else \
+		echo "Starting temporary containers for testing..."; \
+		docker compose run --rm app python manage.py test mirror.tests.ModelTestCase mirror.tests.ViewTestCase --verbosity=2; \
+	fi
+	@echo "✓ Tests completed"
+
+# Run all tests (requires API key)
+test-full: docker-check compose-check env-check
+	@echo "Running full test suite (requires API key)..."
 	@if docker compose ps | grep -q "tactical_empathy_app.*Up"; then \
 		echo "Running tests in existing container..."; \
 		docker compose exec app python manage.py test mirror.tests --verbosity=2; \
@@ -143,7 +170,7 @@ run: docker-check compose-check env-check
 	@echo "✓ Services are running:"
 	@docker compose ps
 	@echo ""
-	@echo "API endpoint: http://localhost:8000/conversation/api/chat/"
+	@echo "API endpoint: http://localhost:8000/api/v1/debate/"
 	@echo "Admin interface: http://localhost:8000/admin/"
 	@echo ""
 	@echo "To view logs: docker compose logs -f"

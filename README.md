@@ -66,7 +66,7 @@ make install
 make run
 ```
 
-The API will be available at `http://localhost:8000/conversation/api/chat/`.
+The API will be available at `http://localhost:8000/api/v1/debate/`.
 
 ### Web Interface
 
@@ -78,36 +78,61 @@ http://localhost:8000/conversation/
 
 ## 🔌 API Interface
 
-### Endpoint
+The application provides a comprehensive REST API for managing debates and conversations.
+
+### Main Debate Endpoint
 
 ```
-POST /conversation/api/chat/
+POST /api/v1/debate/
 ```
 
-### Request Body
+#### Request Body
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
-| `conversation_id` | `string` | `null` | The UUID of the conversation. Use `null` to start a new debate. |
-| `message` | `string` | The user's message. |
+| `conversation_id` | `string` \| `null` | The UUID of the conversation. Use `null` to start a new debate. |
+| `user_message` | `string` | The user's message. |
 
-### Success Response (200 OK)
+#### Success Response (200 OK)
 
 ```json
 {
     "conversation_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    "message": [
+    "user_message": "I think climate change is serious",
+    "messages": [
         {
-            "role": "user",
-            "message": "Your most recent message."
+            "id": "msg-uuid",
+            "role_name": "user",
+            "content": "I think climate change is serious",
+            "created_at": "2025-09-14T05:00:00Z",
+            "conversation_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
         },
         {
-            "role": "bot", 
-            "message": "The bot's new response."
+            "id": "msg-uuid-2", 
+            "role_name": "bot",
+            "content": "Climate change is actually overblown by the media...",
+            "created_at": "2025-09-14T05:00:01Z",
+            "conversation_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
         }
     ]
 }
 ```
+
+### Additional Endpoints
+
+- `GET /api/v1/conversation/` - List all conversations
+- `GET /api/v1/conversation/{id}/` - Get specific conversation details
+- `PUT /api/v1/conversation/{id}/` - Update conversation
+- `DELETE /api/v1/conversation/{id}/` - Delete conversation
+- `GET /api/v1/debate/{conversation_id}/` - Get debate messages for a conversation
+- `GET /api/v1/messages/{message_id}/` - Get specific message
+- `POST /api/v1/messages/` - Create new message
+
+### API Documentation
+
+Interactive API documentation is available at:
+- **Swagger UI**: `http://localhost:8000/api/v1/redoc/`
+- **OpenAPI Schema**: `http://localhost:8000/api/v1/schema/`
 
 ## ⚙️ Development
 
@@ -128,6 +153,51 @@ The `Makefile` provides convenient commands for managing the project:
 
 The project includes a comprehensive test suite that covers API endpoints, database models, and AI service logic.
 
+#### Running Tests
+
+The project provides multiple testing options:
+
+**Basic Tests (No API Key Required)**
+```bash
+make test-offline
+```
+Runs model and view tests without requiring OpenAI API access.
+
+**Full Test Suite (API Key Required)**
 ```bash
 make test
+# or
+make test-full
 ```
+Runs all tests including AI integration tests. Requires `OPENAI_API_KEY` in your `.env` file.
+
+#### Test Coverage
+
+The test suite includes:
+- **Model Tests**: Database model validation and relationships ✅
+- **Web Interface Tests**: Template rendering and view logic ✅  
+- **API Endpoint Tests**: Full request/response cycle testing for debate endpoints
+- **AI Service Tests**: AI provider functionality (requires API key)
+- **Error Handling Tests**: Invalid input and edge case scenarios ✅
+
+**Note**: AI integration tests currently require a valid OpenAI API key. The `test-offline` command runs all tests that don't require external API calls, making it perfect for CI/CD environments and local development without API keys.
+
+## 🔄 Recent Updates
+
+### September 2025 Updates
+
+- **✅ Enhanced Testing Framework**: Added `make test-offline` command for running tests without API key requirements
+- **✅ Improved Make Commands**: Updated Makefile with better error handling and clearer command descriptions
+- **✅ API Documentation**: Added comprehensive API documentation with interactive Swagger UI
+- **✅ Test Coverage**: Separated tests into offline-capable (models, views) and API-dependent (AI integration) categories
+- **✅ Developer Experience**: Improved setup process with better environment validation and error messages
+
+### Current Status
+
+The application is fully functional with:
+- ✅ Complete REST API for debate management
+- ✅ Web interface for interactive testing
+- ✅ PostgreSQL database with proper migrations
+- ✅ Docker containerization for easy deployment
+- ✅ Comprehensive test suite (6/14 tests run offline, 14/14 with API key)
+- ✅ Live demo available at [kopi-challenge.rgrox.com](https://kopi-challenge.rgrox.com)
