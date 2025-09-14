@@ -12,7 +12,7 @@ urlpatterns = [
     path('messages/', views.messages_api_post, name='messages_api_post'),
     # API schema and documentation
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('redoc/', SpectacularRedocView.as_view(url_name='redoc'), name='redoc'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     # Web interface endpoints
     path('web/', views_web.index, name='index'),
     path('web/create/', views_web.create, name='create'),
