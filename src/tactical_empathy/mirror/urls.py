@@ -17,5 +17,5 @@ urlpatterns = [
     path('', views_web.index, name='index'),
     path('create/', views_web.create, name='create'),
     path('list/', views_web.list_conversations, name='list'),
-    path('conversation/<str:id>/', views_web.detail, name='detail'),
+    path('web/conversation/<str:id>/', views_web.detail, name='detail'),
 ]

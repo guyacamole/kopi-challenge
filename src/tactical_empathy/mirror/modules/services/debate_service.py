@@ -1,4 +1,4 @@
-from ...schemas import DebateCreate, Debate, DebateContext, DebateGet, MessageCreate
+from ...schemas import DebateCreate, Debate, DebateContext, DebateGet, MessageCreate, MessageResponse
 from ..utils.openAI_provider import get_openai_provider, OpenAIProvider
 from ...models import Conversation
 from ...models import Message
@@ -39,19 +39,19 @@ def continue_debate(debate_create: DebateCreate) -> Debate:
           content=response
       )
   messages: list[Message] = Message.objects.filter(conversation=conversation).order_by('created_at')
-  # Convert Django Message instances to MessageCreate instances
-  message_creates = [
-      MessageCreate(
+  # Convert Django Message instances to MessageResponse instances
+  message_responses = [
+      MessageResponse(
+          id=message.id,
           content=message.content,
           conversation_id=message.conversation_id,
-          role_name=message.role_name
+          role_name=message.role.name,
+          created_at=message.created_at
       )
       for message in messages
   ]
   return Debate(
-      topic=conversation.topic,
-      bot_stance=conversation.bot_stance,
-      messages=message_creates,
+      messages=message_responses,
       user_message=debate_create.user_message,
       conversation_id=debate_create.conversation_id
   )
@@ -83,20 +83,20 @@ def get_debate(debate_get: DebateGet) -> Debate:
   messages = list(conversation.messages.select_related(
       'role').order_by('created_at')[:debate_get.max_messages])
   
-  # Convert Django Message instances to MessageCreate instances
-  message_creates = [
-      MessageCreate(
+  # Convert Django Message instances to MessageResponse instances
+  message_responses = [
+      MessageResponse(
+          id=message.id,
           content=message.content,
           conversation_id=message.conversation_id,
-          role_name=message.role_name
+          role_name=message.role.name,
+          created_at=message.created_at
       )
       for message in messages
   ]
   
   debate: Debate = Debate(
-      topic=conversation.topic,
-      bot_stance=conversation.bot_stance,
-      messages=message_creates,
+      messages=message_responses,
       user_message=last_user_message,
       conversation_id=debate_get.conversation_id
   )

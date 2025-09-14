@@ -20,6 +20,7 @@ import pydantic
 import logging
 import json
 from drf_spectacular.utils import extend_schema
+from json.decoder import JSONDecodeError
 logger = logging.getLogger(__name__)
 
 
@@ -53,7 +54,8 @@ class ConversationAPIView(APIView):
                 'is_active': conversation.is_active
             }
             return Response(response_data, status=status.HTTP_200_OK)
-            
+        except JSONDecodeError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except pydantic.ValidationError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
