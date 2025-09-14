@@ -6,7 +6,16 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     postgresql-client \
     curl \
-    && curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64 \
+    && ARCH=$(dpkg --print-architecture) \
+    && if [ "$ARCH" = "amd64" ]; then \
+        curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-amd64; \
+    elif [ "$ARCH" = "arm64" ]; then \
+        curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-arm64; \
+    elif [ "$ARCH" = "armhf" ]; then \
+        curl -fsSL -o /usr/local/bin/dbmate https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-arm; \
+    else \
+        echo "Unsupported architecture: $ARCH" && exit 1; \
+    fi \
     && chmod +x /usr/local/bin/dbmate \
     && rm -rf /var/lib/apt/lists/*
 
