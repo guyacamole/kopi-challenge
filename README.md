@@ -66,14 +66,14 @@ make install
 make run
 ```
 
-The API will be available at `http://localhost:8000/api/v1/debate/`.
+The API will be available at `http://localhost:8000/api/v1/`.
 
 ### Web Interface
 
 The application also provides a web interface for testing and interacting with the debate bot. Once the services are running, you can access the main web interface at:
 
 ```
-http://localhost:8000/conversation/
+http://localhost:8000/
 ```
 
 ## 🔌 API Interface
